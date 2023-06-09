@@ -9,6 +9,8 @@ class Gure:
     color = gure_color
 
     def __init__(self, posx=0, posy=0) -> None:
+        self.posx = posx
+        self.posy = posy
         self.gure = pygame.Rect(posx, posy, self.width, self.height)
 
     def draw(self, screen):

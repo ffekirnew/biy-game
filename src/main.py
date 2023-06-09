@@ -1,49 +1,68 @@
-from src.components.biy import Biy
+import pygame
+
+from src.components.player import Player
 from src.game import Game
 from src.components.gure import Gure
-from src.configurations import *
+from src.configurations import screen_width, screen_height, green, red, white, blue
 
 pygame.init()
 
 
 def main():
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    display = (screen_width, screen_height)
+    screen = pygame.display.set_mode((screen_width, screen_height))
+    background = pygame.transform.scale(pygame.image.load("assets/background.jpg"), display)
+
     pygame.display.set_caption("Biy Game")
     clock = pygame.time.Clock()
 
-    player1 = Biy(None, WIDTH / 2 - 450, HEIGHT / 2)
-    player2 = Biy(None, WIDTH / 2 + 450, HEIGHT / 2)
+    game = Game()
 
-    game = Game(player1, player2)
-    player1.game = game
-    player2.game = game
-
-    gures = [
-        Gure(WIDTH / 2, HEIGHT / 2),
-        Gure(WIDTH / 2 - 200, HEIGHT / 2 - 200),
-        Gure(WIDTH / 2 + 200, HEIGHT / 2 - 200),
-        Gure(WIDTH / 2 - 200, HEIGHT / 2 + 200),
-        Gure(WIDTH / 2 + 200, HEIGHT / 2 + 200),
+    players = [
+        Player(game, green, screen_width / 2 - 450, screen_height / 2),
+        Player(game, red, screen_width / 2 + 450, screen_height / 2),
+        Player(game, blue, screen_width / 4 + 450, screen_height / 4),
     ]
 
-    playerActions = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_SPACE]
+    gures = [
+        Gure(screen_width / 2, screen_height / 2),
+        Gure(screen_width / 2 - 200, screen_height / 2 - 200),
+        # Gure(screen_width / 2 + 200, screen_height / 2 - 200),
+        # Gure(screen_width / 2 - 200, screen_height / 2 + 200),
+        # Gure(screen_width / 2 + 200, screen_height / 2 + 200),
+    ]
+
+    for player in players:
+        game.add_player(player)
 
     while True:
-        playing = True
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+            else:
+                game.handle_event(event)
 
-            if event.type == pygame.KEYDOWN and event.key in playerActions:
-                playing = game.turns[game.turn].event(event)
-        screen.fill(background)
-        player1.update(gures, player2.biy)
-        player2.update(gures, player1.biy)
+        screen.blit(background, (0, 0))
         for gure in gures:
+            for player in players:
+                if player.biy.colliderect(gure.gure) and gure not in player.gures:
+                    player.gures.append(gure)
+                    player.posx = gure.posx
+                    player.posy = gure.posy
+                    player.stop()
+
             gure.draw(screen)
-        pygame.draw.ellipse(screen, green, player1.biy)
-        pygame.draw.ellipse(screen, red, player2.biy)
+
+        for player in players[:]:
+            for opponent in players[:]:
+                if player != opponent and len(player.gures) == len(gures):
+                    if player.biy.colliderect(opponent.biy):
+                        players.remove(opponent)
+
+            player.update(gures, player.biy)
+            player.draw(screen)
+
         game.updateScreen(screen)
 
         pygame.display.flip()
