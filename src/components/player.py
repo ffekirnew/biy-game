@@ -49,7 +49,7 @@ class Player:
 
         elif key in (pygame.K_UP, pygame.K_DOWN):
             self.state = "POWER"
-            if key == pygame.K_UP and self.game.power_size < 500:
+            if key == pygame.K_UP and self.game.power_size < max_power_size:
                 self.game.set_power_size(self.game.power_size + 100)
             elif key == pygame.K_DOWN and self.game.power_size > 0:
                 self.game.set_power_size(self.game.power_size - 100)

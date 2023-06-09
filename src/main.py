@@ -5,7 +5,7 @@ from src.components.player import Player
 from src.components.power_bar import PowerBar
 from src.game import Game
 from src.components.gure import Gure
-from src.configurations import screen_width, screen_height, white, green, red, blue, background
+from src.configurations import screen_width, screen_height, white, green, red, blue
 
 pygame.init()
 pygame.font.init()
@@ -20,8 +20,8 @@ power_bar = PowerBar(screen)
 
 
 def main_menu():
-    menu_font = pygame.font.Font(None, 36)
-    title_font = pygame.font.Font(None, 60)
+    menu_font = pygame.font.SysFont("JetBrains Mono", 36)
+    title_font = pygame.font.SysFont("JetBrains Mono", 60)
 
     title_text = title_font.render("Biy Game", True, white)
     start_text = menu_font.render("Start", True, white)
@@ -113,9 +113,9 @@ def main():
     ]
 
     gures = [
-        Gure(screen_width / 2, screen_height / 2),
-        Gure(screen_width / 2 - 200, screen_height / 2 - 200),
-        # add one with random x and y
+        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
+        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
+        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
         Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
     ]
 
