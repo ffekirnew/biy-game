@@ -8,24 +8,28 @@ from src.configurations import *
 class Player:
     width = player_width
     height = player_height
+    states = ["IDLE", "SHOOTING", "AIMING"]
 
-    def __init__(self, game, color, posx, posy):
+    def __init__(self, game, image_file_name, pos_x, pos_y):
+        self.state = self.states[0]
         self.game = game
-        self.posx = posx
-        self.posy = posy
-        self.theta = 0
-        self.color = color
-        self.biy = pygame.Rect(self.posx, self.posy, self.width, self.height)
-        self.start = [self.posx + 10, self.posy + 10]
-        self.end = [int(self.start[0] + 40 * math.cos(math.radians(self.theta))),
-                    int(self.start[1] + 40 * math.sin(math.radians(self.theta)))]
+
+        self.pos_x = pos_x
+        self.pos_y = pos_y
+        self.direction = 0
+
+        self.biy = pygame.Rect(self.pos_x, self.pos_y, self.width, self.height)
+        self.image = pygame.transform.scale(pygame.image.load(image_file_name), (self.width, self.height))
 
         self.speed_x = 0
         self.speed_y = 0
 
         self.gures = []
 
-        self.move = [self.posx, self.posy]
+        self.move = [self.pos_x, self.pos_y]
+
+    def center(self):
+        return [self.pos_x + self.width // 2, self.pos_y + self.height // 2]
 
     def handle_event(self, event):
         if event.type != pygame.KEYDOWN:
@@ -33,49 +37,49 @@ class Player:
 
         key = event.key
         if key == pygame.K_SPACE:
-            self.speed_x = 0.01 * self.game.powerSize * math.cos(math.radians(self.theta))
-            self.speed_y = 0.01 * self.game.powerSize * math.sin(math.radians(self.theta))
+            self.state = "SHOOTING"
+            self.speed_x = 0.01 * self.game.power_size * math.cos(math.radians(self.direction))
+            self.speed_y = 0.01 * self.game.power_size * math.sin(math.radians(self.direction))
 
             return 1
 
         elif key in (pygame.K_LEFT, pygame.K_RIGHT):
-            self.theta += 10 if key == pygame.K_RIGHT else -10
-            self.end = [
-                int(self.posx + 40 * math.cos(math.radians(self.theta))),
-                int(self.posy + 40 * math.sin(math.radians(self.theta)))
-            ]
+            self.state = "AIMING"
+            self.direction += 10 if key == pygame.K_RIGHT else -10
 
         elif key in (pygame.K_UP, pygame.K_DOWN):
-            if key == pygame.K_UP:
-                while self.game.powerSize < 500:
-                    self.game.powerSize += 100
-            else:
-                while self.game.powerSize > 0:
-                    self.game.powerSize -= 100
+            self.state = "POWER"
+            if key == pygame.K_UP and self.game.power_size < 500:
+                self.game.set_power_size(self.game.power_size + 100)
+            elif key == pygame.K_DOWN and self.game.power_size > 0:
+                self.game.set_power_size(self.game.power_size - 100)
 
         return 0
 
-    def update(self, gure=[], opponent=None):
-        self.posx, self.posy = self.posx + self.speed_x, self.posy + self.speed_y
-        self.start = [self.posx + 10, self.posy + 10]
-        self.biy.x, self.biy.y = self.posx, self.posy
+    def update(self):
+        self.pos_x, self.pos_y = self.pos_x + self.speed_x, self.pos_y + self.speed_y
+        self.biy.x, self.biy.y = self.pos_x, self.pos_y
 
         if self.speed_x == 0 and self.speed_y == 0:
             self.game.shooting = False
 
-        if self.posx <= 20 or self.posx >= screen_width - 20:
-            self.speed_x = -1 * self.speed_x
-        if self.posy <= 20 or self.posy >= screen_height - 20:
-            self.speed_y = -1 * self.speed_y
+        if not (
+                - self.width // 2 <= self.pos_x <= screen_width - self.width // 2
+                and
+                - self.height // 2 <= self.pos_y <= screen_height - self.height // 2
+        ):
+            self.stop()
 
-        self.speed_x = self.updateSpeed(self.speed_x)
-        self.speed_y = self.updateSpeed(self.speed_y)
+        self.speed_x = self.update_speed(self.speed_x)
+        self.speed_y = self.update_speed(self.speed_y)
+        # self.start = [(self.pos_x + self.width) // 2, (self.pos_y + self.height) // 2]
 
     def stop(self):
         self.speed_x = 0
         self.speed_y = 0
 
-    def updateSpeed(self, speed):
+    @staticmethod
+    def update_speed(speed):
         speedDx = {True: -0.005, False: 0.005}
         x = speed > 0
         speed += speedDx[speed > 0]
@@ -85,4 +89,14 @@ class Player:
         return speed
 
     def draw(self, screen):
-        pygame.draw.ellipse(screen, self.color, self.biy)
+        if self.state == "AIMING" or self.state == "POWER":
+            start = self.center()
+            end = [start[0] + 100 * math.cos(math.radians(self.direction)),
+                   start[1] + 100 * math.sin(math.radians(self.direction))]
+            pygame.draw.line(screen, white, start, end, 2)
+
+        if self.state == "POWER":
+            # TODO: draw power bar
+            pass
+
+        screen.blit(self.image, (self.pos_x, self.pos_y))

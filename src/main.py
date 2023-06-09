@@ -1,39 +1,129 @@
-import pygame
+import random
 
+import pygame
 from src.components.player import Player
+from src.components.power_bar import PowerBar
 from src.game import Game
 from src.components.gure import Gure
-from src.configurations import screen_width, screen_height, green, red, white, blue
+from src.configurations import screen_width, screen_height, white, green, red, blue, background
 
 pygame.init()
+pygame.font.init()
+
+display = (screen_width, screen_height)
+screen = pygame.display.set_mode(display)
+background = pygame.transform.scale(pygame.image.load("assets/background.jpg"), display)
+
+pygame.display.set_caption("Biy Game")
+
+power_bar = PowerBar(screen)
+
+
+def main_menu():
+    menu_font = pygame.font.Font(None, 36)
+    title_font = pygame.font.Font(None, 60)
+
+    title_text = title_font.render("Biy Game", True, white)
+    start_text = menu_font.render("Start", True, white)
+    options_text = menu_font.render("Options", True, white)
+    quit_text = menu_font.render("Quit", True, white)
+
+    title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 4))
+    start_rect = start_text.get_rect(center=(screen_width / 2, screen_height / 2))
+    options_rect = options_text.get_rect(center=(screen_width / 2, screen_height / 2 + 50))
+    quit_rect = quit_text.get_rect(center=(screen_width / 2, screen_height * 3 / 4))
+
+    menu_items = [
+        {"text": start_text, "rect": start_rect, "action": "start"},
+        {"text": options_text, "rect": options_rect, "action": "options"},
+        {"text": quit_text, "rect": quit_rect, "action": "quit"}
+    ]
+
+    selected_item_index = 0
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    selected_item_index = (selected_item_index - 1) % len(menu_items)
+                elif event.key == pygame.K_DOWN:
+                    selected_item_index = (selected_item_index + 1) % len(menu_items)
+                elif event.key == pygame.K_RETURN:
+                    selected_item = menu_items[selected_item_index]
+                    if selected_item["action"] == "start":
+                        return
+                    elif selected_item["action"] == "options":
+                        options_menu()
+                    elif selected_item["action"] == "quit":
+                        pygame.quit()
+                        exit()
+
+        screen.blit(background, (0, 0))
+        screen.blit(title_text, title_rect)
+
+        for index, item in enumerate(menu_items):
+            text = item["text"]
+            rect = item["rect"]
+            if index == selected_item_index:
+                pygame.draw.rect(screen, green, rect.inflate(10, 10))
+            screen.blit(text, rect)
+
+        pygame.display.flip()
+
+
+def options_menu():
+    menu_font = pygame.font.Font(None, 36)
+    title_font = pygame.font.Font(None, 60)
+
+    title_text = title_font.render("Options", True, white)
+    back_text = menu_font.render("Back", True, white)
+
+    title_rect = title_text.get_rect(center=(screen_width / 2, screen_height / 4))
+    back_rect = back_text.get_rect(center=(screen_width / 2, screen_height / 2))
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+            elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return
+
+        screen.fill((0, 0, 0))
+        screen.blit(title_text, title_rect)
+        screen.blit(back_text, back_rect)
+
+        pygame.display.flip()
 
 
 def main():
-    display = (screen_width, screen_height)
-    screen = pygame.display.set_mode((screen_width, screen_height))
-    background = pygame.transform.scale(pygame.image.load("assets/background.jpg"), display)
-
-    pygame.display.set_caption("Biy Game")
     clock = pygame.time.Clock()
 
-    game = Game()
+    main_menu()
+
+    game = Game(screen)
 
     players = [
-        Player(game, green, screen_width / 2 - 450, screen_height / 2),
-        Player(game, red, screen_width / 2 + 450, screen_height / 2),
-        Player(game, blue, screen_width / 4 + 450, screen_height / 4),
+        Player(game, "assets/biy/real-biy-4.png", screen_width / 2 - 450, screen_height / 2),
+        Player(game, "assets/biy/real-biy-2.png", screen_width / 2 + 450, screen_height / 2),
+        Player(game, "assets/biy/real-biy-3.png", screen_width / 2, screen_height / 4),
     ]
 
     gures = [
         Gure(screen_width / 2, screen_height / 2),
         Gure(screen_width / 2 - 200, screen_height / 2 - 200),
-        # Gure(screen_width / 2 + 200, screen_height / 2 - 200),
-        # Gure(screen_width / 2 - 200, screen_height / 2 + 200),
-        # Gure(screen_width / 2 + 200, screen_height / 2 + 200),
+        # add one with random x and y
+        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
     ]
 
     for player in players:
         game.add_player(player)
+
+    for gure in gures:
+        game.add_gure(gure)
 
     while True:
         for event in pygame.event.get():
@@ -41,30 +131,13 @@ def main():
                 pygame.quit()
                 exit()
             else:
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    main_menu()
                 game.handle_event(event)
 
         screen.blit(background, (0, 0))
-        for gure in gures:
-            for player in players:
-                if player.biy.colliderect(gure.gure) and gure not in player.gures:
-                    player.gures.append(gure)
-                    player.posx = gure.posx
-                    player.posy = gure.posy
-                    player.stop()
 
-            gure.draw(screen)
-
-        for player in players[:]:
-            for opponent in players[:]:
-                if player != opponent and len(player.gures) == len(gures):
-                    if player.biy.colliderect(opponent.biy):
-                        players.remove(opponent)
-
-            player.update(gures, player.biy)
-            player.draw(screen)
-
-        game.updateScreen(screen)
-
+        game.draw()
         pygame.display.flip()
         clock.tick(60)
 
