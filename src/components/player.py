@@ -63,10 +63,12 @@ class Player:
         if self.speed_x == 0 and self.speed_y == 0:
             self.game.shooting = False
 
-        if not (
-                - self.width // 2 <= self.pos_x <= screen_width - self.width // 2
-                and
-                - self.height // 2 <= self.pos_y <= screen_height - self.height // 2
+        if (
+                (self.pos_x < 0 or self.pos_x > screen_width - self.width) and (
+                self.direction < 90 or self.direction > 270)
+        ) or (
+                (self.pos_y < 0 or self.pos_y > screen_height - self.height) and (
+                0 < self.direction < 180)
         ):
             self.stop()
 

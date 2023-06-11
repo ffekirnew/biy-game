@@ -107,9 +107,10 @@ def main():
     game = Game(screen)
 
     players = [
-        Player(game, "assets/biy/real-biy-4.png", screen_width / 2 - 450, screen_height / 2),
+        Player(game, "assets/biy/real-biy-1.png", screen_width / 2 - 450, screen_height / 2),
         Player(game, "assets/biy/real-biy-2.png", screen_width / 2 + 450, screen_height / 2),
         Player(game, "assets/biy/real-biy-3.png", screen_width / 2, screen_height / 4),
+        Player(game, "assets/biy/real-biy-5.png", screen_width / 2, screen_height / 4 + 100),
     ]
 
     gures = [

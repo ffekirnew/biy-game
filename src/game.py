@@ -1,3 +1,5 @@
+import math
+
 import pygame
 
 from src.components.gure import Gure
@@ -51,16 +53,45 @@ class Game:
         for player_index, player in enumerate(self.players[:]):
             opponent_taken = False
 
-            if not opponent_taken:
-                for opponent in self.players[:]:
-                    if player != opponent and len(player.gures) == len(self.gures):
-                        if player.biy.colliderect(opponent.biy):
-                            player.pos_x, player.pos_y = opponent.pos_x, opponent.pos_y
+            for opponent in self.players[:]:
+                if player != opponent:
+                    dx = player.pos_x - opponent.pos_x
+                    dy = player.pos_y - opponent.pos_y
+                    distance = math.sqrt(dx ** 2 + dy ** 2)
+
+                    if distance < biy_radius * 2:
+                        angle = math.atan2(dy, dx)
+                        sin_angle = math.sin(angle)
+                        cos_angle = math.cos(angle)
+
+                        # Rotate the velocities
+                        vx1 = player.speed_x * cos_angle + player.speed_y * sin_angle
+                        vy1 = player.speed_y * cos_angle - player.speed_x * sin_angle
+                        vx2 = opponent.speed_x * cos_angle + opponent.speed_y * sin_angle
+                        vy2 = opponent.speed_y * cos_angle - opponent.speed_x * sin_angle
+
+                        # Calculate new velocities after collision
+                        v1x = ((biy_radius - biy_radius) * vx1 + (2 * biy_radius) * vx2) / (
+                                    biy_radius + biy_radius)
+                        v2x = ((2 * biy_radius) * vx1 + (biy_radius - biy_radius) * vx2) / (
+                                    biy_radius + biy_radius)
+                        v1y = vy1
+                        v2y = vy2
+
+                        # Rotate the velocities back
+                        player.speed_x = v1x * cos_angle - v1y * sin_angle
+                        player.speed_y = v1y * cos_angle + v1x * sin_angle
+                        opponent.speed_x = v2x * cos_angle - v2y * sin_angle
+                        opponent.speed_y = v2y * cos_angle + v2x * sin_angle
+
+                        if len(player.gures) == len(self.gures):
                             self.players.remove(opponent)
-                            player.stop()
-                            self.force_turn(player_index)
                             opponent_taken = True
-                            break
+
+                        self.force_turn(player_index)
+
+                else:
+                    break
 
             player.update()
             player.draw(self.screen)
