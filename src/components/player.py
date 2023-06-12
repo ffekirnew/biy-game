@@ -1,6 +1,4 @@
 import math
-import random
-import pygame
 
 from src.configurations import *
 
@@ -24,7 +22,7 @@ class Player:
         self.speed_x = 0
         self.speed_y = 0
 
-        self.gures = []
+        self.gures = set()
 
         self.move = [self.pos_x, self.pos_y]
 
@@ -63,18 +61,17 @@ class Player:
         if self.speed_x == 0 and self.speed_y == 0:
             self.game.shooting = False
 
-        if (
-                (self.pos_x < 0 or self.pos_x > screen_width - self.width) and (
-                self.direction < 90 or self.direction > 270)
-        ) or (
-                (self.pos_y < 0 or self.pos_y > screen_height - self.height) and (
-                0 < self.direction < 180)
-        ):
+        if not (
+                0 < self.pos_x + self.speed_x < screen_width - self.width and
+                0 < self.pos_y + self.speed_y < screen_height - self.height):
             self.stop()
 
         self.speed_x = self.update_speed(self.speed_x)
         self.speed_y = self.update_speed(self.speed_y)
         # self.start = [(self.pos_x + self.width) // 2, (self.pos_y + self.height) // 2]
+
+        if self.state == "SHOOTING" and self.speed_x == self.speed_y == 0:
+            self.state = "IDLE"
 
     def stop(self):
         self.speed_x = 0
@@ -91,14 +88,13 @@ class Player:
         return speed
 
     def draw(self, screen):
-        if self.state == "AIMING" or self.state == "POWER":
+        if self.state in ["POWER", "AIMING"]:
             start = self.center()
             end = [start[0] + 100 * math.cos(math.radians(self.direction)),
                    start[1] + 100 * math.sin(math.radians(self.direction))]
             pygame.draw.line(screen, white, start, end, 2)
 
         if self.state == "POWER":
-            # TODO: draw power bar
-            pass
+            self.game.power_bar.draw()
 
         screen.blit(self.image, (self.pos_x, self.pos_y))

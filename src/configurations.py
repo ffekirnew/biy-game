@@ -12,7 +12,7 @@ player_width = 50
 player_height = 50
 biy_radius = 25
 
-max_power_size = 900
+max_power_size = 2000
 
 background = pygame.Color("gray12")
 white = pygame.Color("WHITE")

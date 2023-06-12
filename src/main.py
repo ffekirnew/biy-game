@@ -5,14 +5,17 @@ from src.components.player import Player
 from src.components.power_bar import PowerBar
 from src.game import Game
 from src.components.gure import Gure
-from src.configurations import screen_width, screen_height, white, green, red, blue
+from src.configurations import screen_width, screen_height, white, green, red, blue, player_width
 
 pygame.init()
 pygame.font.init()
+pygame.mixer.init()
 
 display = (screen_width, screen_height)
 screen = pygame.display.set_mode(display)
-background = pygame.transform.scale(pygame.image.load("assets/background.jpg"), display)
+menu_background = pygame.transform.scale(pygame.image.load("assets/images/background_2.jpg"), display)
+background = pygame.transform.scale(pygame.image.load("assets/images/background.jpg"), display)
+pygame.mixer.music.load("assets/music/background_music/home-head_first.mp3")
 
 pygame.display.set_caption("Biy Game")
 
@@ -61,7 +64,7 @@ def main_menu():
                         pygame.quit()
                         exit()
 
-        screen.blit(background, (0, 0))
+        screen.blit(menu_background, (0, 0))
         screen.blit(title_text, title_rect)
 
         for index, item in enumerate(menu_items):
@@ -100,6 +103,8 @@ def options_menu():
 
 
 def main():
+    # play music
+    pygame.mixer.music.play(10, 54.8, 2000)
     clock = pygame.time.Clock()
 
     main_menu()
@@ -107,17 +112,17 @@ def main():
     game = Game(screen)
 
     players = [
-        Player(game, "assets/biy/real-biy-1.png", screen_width / 2 - 450, screen_height / 2),
-        Player(game, "assets/biy/real-biy-2.png", screen_width / 2 + 450, screen_height / 2),
-        Player(game, "assets/biy/real-biy-3.png", screen_width / 2, screen_height / 4),
-        Player(game, "assets/biy/real-biy-5.png", screen_width / 2, screen_height / 4 + 100),
+        # Player(game, "assets/images/biy/real-biy-1.png", screen_width / 2 - 450, screen_height / 2),
+        Player(game, "assets/images/biy/real-biy-2.png", screen_width / 2 + 450, screen_height / 2),
+        Player(game, "assets/images/biy/real-biy-3.png", screen_width / 2, screen_height / 4),
+        # Player(game, "assets/images/biy/real-biy-5.png", screen_width / 2, screen_height / 4 + 100),
     ]
 
     gures = [
+        # Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
         Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
         Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
+        # Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
     ]
 
     for player in players:
@@ -134,11 +139,21 @@ def main():
             else:
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
                     main_menu()
-                game.handle_event(event)
+
+                if len(game.players) > 1:
+                    game.handle_event(event)
 
         screen.blit(background, (0, 0))
 
-        game.draw()
+        if len(game.players) == 1:
+            winner = game.players[0]
+            screen.blit(winner.image, (screen_width // 2 - player_width, screen_height // 4))
+            winner_text = pygame.font.SysFont("JetBrains Mono", 60).render("Wins!", True, white)
+
+            winner_rect = winner_text.get_rect(center=(screen_width // 2, screen_height // 2))
+            screen.blit(winner_text, winner_rect)
+        else:
+            game.draw()
         pygame.display.flip()
         clock.tick(60)
 
