@@ -15,26 +15,54 @@ class Game:
         self.turn = 0
         self.players = []
         self.gures = []
+
         self.screen = screen
         self.power_size = 100
-        self.power_bar = PowerBar(self.screen)
 
+        self.power_bar = PowerBar(self.screen)
         self.player_indicator = PlayerIndicator(screen_width - 100, 100)
 
-    def add_player(self, player: Player):
+    def add_player(self, player: Player) -> None:
+        """Add a new player to the game.
+        Parameters:
+            player (Player): An object of the player type.
+        Return:
+            None.
+        """
         self.players.append(player)
 
-    def add_gure(self, gure: Gure):
+    def add_gure(self, gure: Gure) -> None:
+        """Add a new gure to the game.
+        Parameters:
+            gure (Gure): An object of the gure type.
+        Return:
+            None.
+        """
+
         self.gures.append(gure)
 
-    def set_power_size(self, power_size):
+    def set_power_size(self, power_size: int) -> None:
+        """Set the power size for shooting players.
+        Parameter:
+            power_size (int): Any integer greater than 0 and less
+            than the max_power_size in the configuration.
+        Return:
+            None.
+        """
         self.power_size = power_size
         self.power_bar.update(self.power_size)
 
-    def handle_event(self, event):
-        current_player_status = self.players[self.turn].handle_event(event)
+    def handle_event(self, event) -> None:
+        """Handle events from the game.
+        Actually pass on the event to the current turn player to handle it themselves.
+        Parameter:
+            event (pygame.event): A pygame event
+        Return:
+            None
+        """
+        current_player_status = self.players[self.turn].handle_event(event) # if the player shoots, will return 1. Else 0
 
-        self.turn = (self.turn + current_player_status) % len(self.players)
+        self.turn = (self.turn + current_player_status) % len(self.players) # then use that to change the turn to the next player, or not
 
     def force_turn(self, turn: int):
         self.turn = turn
