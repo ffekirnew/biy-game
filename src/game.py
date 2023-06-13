@@ -7,6 +7,7 @@ from src.components.player import Player
 from src.components.player_indicator import PlayerIndicator
 from src.components.power_bar import PowerBar
 from src.configurations import *
+from src.utility.player_state import PlayerState
 
 
 class Game:
@@ -45,7 +46,8 @@ class Game:
                 next_x, next_y = player.pos_x + player.speed_x, player.pos_y + player.speed_y
                 next_distance = math.sqrt((next_x - gure.pos_x) ** 2 + (next_y - gure.pos_y) ** 2)
 
-                if (player.pos_x < gure.pos_x < next_x or next_y < gure.pos_y < player.pos_y) and next_distance < biy_radius and distance < biy_radius:
+                if (player.pos_x < gure.pos_x < next_x or next_y < gure.pos_y < player.pos_y) and (
+                        distance < biy_radius * 2):
                     player.gures.add(gure)
                     player.stop()
                     player.pos_x = gure.pos_x
@@ -54,7 +56,7 @@ class Game:
 
     def handle_player_interactions(self):
         for player_index, player in enumerate(self.players[:]):
-            if player.state == "SHOOTING":
+            if player.state == PlayerState.SHOOTING:
                 for opponent in self.players[:]:
                     if player != opponent:
                         dx = player.pos_x - opponent.pos_x
@@ -88,7 +90,6 @@ class Game:
 
                             if len(player.gures) == len(self.gures):
                                 self.players.remove(opponent)
-                                opponent_taken = True
 
                                 self.force_turn(player_index - 1)
                             else:
@@ -110,5 +111,5 @@ class Game:
         self.draw_gures()
         self.draw_players()
 
-        if all(player.state != "SHOOTING" for player in self.players):
+        if all(player.state != PlayerState.SHOOTING for player in self.players):
             self.player_indicator.draw(self.screen, self.players[self.turn])
