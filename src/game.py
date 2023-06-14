@@ -38,36 +38,48 @@ class Game:
         Return:
             None.
         """
-
         self.gures.append(gure)
 
     def set_power_size(self, power_size: int) -> None:
-        """Set the power size for shooting players.
-        Parameter:
-            power_size (int): Any integer greater than 0 and less
-            than the max_power_size in the configuration.
+        """Set the power size of the game.
+        Parameters:
+            power_size (int): The power size of the game.
         Return:
             None.
         """
         self.power_size = power_size
         self.power_bar.update(self.power_size)
 
-    def handle_event(self, event) -> None:
-        """Handle events from the game.
-        Actually pass on the event to the current turn player to handle it themselves.
+    def handle_event(self, event: pygame.event.Event) -> None:
+        """Handle events for the game.
         Parameter:
-            event (pygame.event): A pygame event
+            event (pygame.event.Event): An event object.
         Return:
-            None
+            None.
         """
-        current_player_status = self.players[self.turn].handle_event(event) # if the player shoots, will return 1. Else 0
+        current_player_status = self.players[self.turn].handle_event(
+            event)  # if the player shoots, will return 1. Else 0
 
-        self.turn = (self.turn + current_player_status) % len(self.players) # then use that to change the turn to the next player, or not
+        self.turn = (self.turn + current_player_status) % len(
+            self.players)  # then use that to change the turn to the next player, or not
 
     def force_turn(self, turn: int):
+        """Force the turn to a specific player.
+        Parameter:
+            turn (int): The index of the player to force the turn to.
+        Return:
+            None.
+        """
         self.turn = turn
 
     def handle_gure_interactions(self):
+        """Handle interactions between gures and players.
+        If a player is within the radius of a gure, the player will stop moving.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         for player_index, player in enumerate(self.players[:]):
             for gure in self.gures:
                 distance = math.sqrt((player.pos_x - gure.pos_x) ** 2 + (player.pos_y - gure.pos_y) ** 2)
@@ -83,6 +95,14 @@ class Game:
                     self.force_turn(player_index)
 
     def handle_player_interactions(self):
+        """Handle interactions between players.
+        If a player is shooting, check if they hit another player.
+        If they do, stop the player and add the gure to the player.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         for player_index, player in enumerate(self.players[:]):
             if player.state == PlayerState.SHOOTING:
                 for opponent in self.players[:]:
@@ -124,15 +144,33 @@ class Game:
                                 self.force_turn(player_index)
 
     def draw_players(self):
+        """Draw all players on the screen.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         for player in self.players:
             player.update()
             player.draw(self.screen)
 
     def draw_gures(self):
+        """Draw all gures on the screen.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         for gure in self.gures:
             gure.draw(self.screen)
 
     def draw(self):
+        """Draw the game on the screen.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         self.handle_player_interactions()
         self.handle_gure_interactions()
 

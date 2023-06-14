@@ -7,6 +7,7 @@ gure_width = 60
 gure_height = 60
 # assign a dirty dark brown color to the gure_color variable
 gure_color = pygame.Color("sienna4")
+gure_image_file = "assets/images/gure.png"
 
 player_width = 50
 player_height = 50
