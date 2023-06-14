@@ -11,6 +11,27 @@ from src.utility.player_state import PlayerState
 
 
 class Game:
+    """Implement a game class that will be used in the pygame window.
+    Parameters:
+        screen (pygame.Surface): The pygame window.
+    Attributes:
+        turn (int): The turn of the game.
+        players (list): A list of players.
+        gures (list): A list of gures.
+        screen (pygame.Surface): The pygame window.
+        power_size (int): The power size of the game.
+        power_bar (PowerBar): An object of the power bar type.
+        player_indicator (PlayerIndicator): An object of the player indicator type.
+    Methods:
+        add_player(player): Add a new player to the game.
+        add_gure(gure): Add a new gure to the game.
+        set_power(power): Set the power of the game.
+        handle_event(event): Handle events for the game.
+        update(): Update the game.
+        draw(screen): Draw the game.
+    Returns:
+        None.
+    """
     def __init__(self, screen):
         self.turn = 0
         self.players = []
