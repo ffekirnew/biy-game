@@ -1,11 +1,36 @@
 import math
 from enum import Enum
+from typing import List
 
 from src.configurations import *
 from src.utility.player_state import PlayerState
 
 
 class Player:
+    """Implement a player component that will be used in the pygame window.
+    Parameters:
+        game (Game): An object of the game type.
+        image_file_name (str): The name of the image file.
+        pos_x (int): The x coordinate of the player.
+        pos_y (int): The y coordinate of the player.
+    Attributes:
+        state (PlayerState): The state of the player.
+        game (Game): An object of the game type.
+        pos_x (int): The x coordinate of the player.
+        pos_y (int): The y coordinate of the player.
+        direction (int): The direction of the player.
+        biy (pygame.Rect): The bounding rectangle of the player.
+        image (pygame.Surface): The image of the player.
+        speed_x (int): The speed of the player in the x direction.
+        speed_y (int): The speed of the player in the y direction.
+        gures (set): A set of gures.
+        move (list): A list of the player's movement.
+    Methods:
+        center(): Return the center of the player.
+        handle_event(event): Handle events for the player.
+        update(): Update the player.
+        draw(screen): Draw the player.
+    """
     width = player_width
     height = player_height
 
@@ -27,10 +52,22 @@ class Player:
 
         self.move = [self.pos_x, self.pos_y]
 
-    def center(self):
+    def center(self) -> List[int]:
+        """Return the center of the player.
+        Parameters:
+            None.
+        Return:
+            list: A list of the x and y coordinates of the center of the player.
+        """
         return [self.pos_x + self.width // 2, self.pos_y + self.height // 2]
 
-    def handle_event(self, event):
+    def handle_event(self, event: pygame.event.Event) -> int:
+        """Handle events for the player.
+        Parameter:
+            event (pygame.event.Event): An event object.
+        Return:
+            int: The status of the plaeyer, 1 if they are done, 0 if they are not.
+        """
         # Allow for long press key presses
         if event.type != pygame.KEYDOWN:
             return 0
@@ -65,6 +102,12 @@ class Player:
         return 0
 
     def update(self):
+        """Update the player's position and speed.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         # Check if the custom event for long press has been triggered
         if pygame.event.peek(pygame.USEREVENT):
             # Handle long press here for aiming
@@ -94,11 +137,23 @@ class Player:
             self.state = PlayerState.IDLE
 
     def stop(self):
+        """Stop the player.
+        Parameter:
+            None.
+        Return:
+            None.
+        """
         self.speed_x = 0
         self.speed_y = 0
 
     @staticmethod
-    def update_speed(speed):
+    def update_speed(speed: int) -> int:
+        """Update the speed of the player.
+        Parameter:
+            speed (int): The speed of the player.
+        Return:
+            int: The updated speed of the player.
+        """
         speedDx = {True: -0.005, False: 0.005}
         x = speed > 0
         speed += speedDx[speed > 0]
@@ -108,6 +163,12 @@ class Player:
         return speed
 
     def draw(self, screen):
+        """Draw the player.
+        Parameter:
+            screen (pygame.Surface): The screen to draw the player on.
+        Return:
+            None.
+        """
         if self.state in [PlayerState.AIMING, PlayerState.POWER]:
             start = self.center()
             end = [start[0] + 100 * math.cos(math.radians(self.direction)),
