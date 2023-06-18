@@ -1,13 +1,15 @@
 import math
+import random
 from typing import Tuple
 
 import pygame
 
 from src.components.gure import Gure
 from src.components.player import Player
-from src.components.player_indicator import PlayerIndicator
+from src.components.player_status_indicator import PlayerStatusIndicator
 from src.components.power_bar import PowerBar
 from src.configurations import *
+from src.utility.game_mode import GameMode
 from src.utility.player_state import PlayerState
 
 
@@ -22,7 +24,7 @@ class Game:
         screen (pygame.Surface): The pygame window.
         power_size (int): The power size of the game.
         power_bar (PowerBar): An object of the power bar type.
-        player_indicator (PlayerIndicator): An object of the player indicator type.
+        player_indicator (PlayerStatusIndicator): An object of the player indicator type.
     Methods:
         add_player(player): Add a new player to the game.
         add_gure(gure): Add a new gure to the game.
@@ -46,7 +48,37 @@ class Game:
         self.power_size = 100
 
         self.power_bar = PowerBar(self.screen)
-        self.player_indicator = PlayerIndicator(screen_width - 100, 100)
+        self.player_indicator = PlayerStatusIndicator(self.screen)
+
+        self.load()
+
+    def load(self) -> None:
+        """Load the game.
+        Parameters:
+            None.
+        Return:
+            None.
+        """
+        for i in range(number_of_players[0]):
+            self.players.append(
+                Player(self, f"assets/images/biy/biy-{i + 1}{i + 1}.png", random.randint(0, screen_width),
+                       random.randint(0, screen_height)))
+        if game_mode[0] == GameMode.RANDOM:
+            for i in range(number_of_gures[0]):
+                self.gures.append(Gure(random.randint(0, screen_width), random.randint(0, screen_height)))
+        else:
+            # add 5 gures drawing a cross in the game
+            padding = 150
+            gures = [
+                Gure(screen_width // 2, screen_height // 2),
+                Gure(screen_width // 2 - padding, screen_height // 2),
+                Gure(screen_width // 2 + padding, screen_height // 2),
+                Gure(screen_width // 2, screen_height // 2 - padding),
+                Gure(screen_width // 2, screen_height // 2 + padding)
+            ]
+
+            for gure in gures:
+                self.gures.append(gure)
 
     def add_player(self, player: Player) -> None:
         """Add a new player to the game.
@@ -209,7 +241,16 @@ class Game:
         self.draw_players(scaling_factor, translation_vector)
 
         if all(player.state != PlayerState.SHOOTING for player in self.players):
-            self.player_indicator.draw(self.screen, self.players[self.turn])
+            self.player_indicator.draw(self.players[self.turn], len(self.gures))
+
+        # flash on the gures still left to complete with red for the player that is aiming or powering
+        if self.players[self.turn].state == PlayerState.AIMING or self.players[self.turn].state == PlayerState.POWER:
+            for gure in self.gures:
+                if gure not in self.players[self.turn].gures:
+                    # draw a red dot on the gure
+                    pygame.draw.circle(self.screen, (255, 0, 0),
+                                       (int(gure.pos_x * scaling_factor + translation_vector[0]),
+                                        int(gure.pos_y * scaling_factor + translation_vector[1])), 5)
 
     def determine_scaling_and_translation_vector(self) -> Tuple[float, Tuple[float]]:
         """Determine the scaling factor and translation vector to draw the game.

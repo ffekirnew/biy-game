@@ -1,43 +1,22 @@
 import random
-import pygame
 
 from src.components.gure import Gure
 from src.components.player import Player
 from src.configurations import *
-from src.game import Game
-from src.screens.main_menu import main_menu
+from src.components.game import Game
+from src.screens.menu_screens.main_menu import main_menu
 
 pygame.font.init()
 
 
 def main(screen):
     # play music
-    pygame.mixer.music.play(10, 54.8, 2000)
+    # pygame.mixer.music.play(10, 54.8, 2000)
     clock = pygame.time.Clock()
 
     main_menu(screen)
 
     game = Game(screen)
-
-    players = [
-        # Player(game, "assets/images/biy/biy-1.png", screen_width / 2 - 450, screen_height / 2),
-        Player(game, "assets/images/biy/biy-2.png", screen_width / 2 + 450, screen_height / 2),
-        Player(game, "assets/images/biy/biy-3.png", screen_width / 2, screen_height / 4),
-        # Player(game, "assets/images/biy/biy-5.png", screen_width / 2, screen_height / 4 + 100),
-    ]
-
-    gures = [
-        # Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-        Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-        # Gure(random.randint(0, screen_width), random.randint(0, screen_height)),
-    ]
-
-    for player in players:
-        game.add_player(player)
-
-    for gure in gures:
-        game.add_gure(gure)
 
     while True:
         for event in pygame.event.get():

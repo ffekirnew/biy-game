@@ -1,7 +1,7 @@
 import pygame
 
 from src.configurations import display
-from src.screens.game import main
+from src.screens.main_screen import main
 
 pygame.init()
 pygame.font.init()
