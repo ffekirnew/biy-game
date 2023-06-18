@@ -83,7 +83,8 @@ class Game:
         Return:
             None.
         """
-        current_player_status = self.players[self.turn].handle_event(event)  # if the player shoots, will return 1. Else 0
+        current_player_status = self.players[self.turn].handle_event(
+            event)  # if the player shoots, will return 1. Else 0
 
         self.turn = (self.turn + current_player_status) % len(
             self.players)  # then use that to change the turn to the next player, or not
@@ -105,6 +106,7 @@ class Game:
         Return:
             None.
         """
+        biy_radius = Player.height // 2
         for player_index, player in enumerate(self.players[:]):
             for gure in self.gures:
                 distance = math.sqrt((player.pos_x - gure.pos_x) ** 2 + (player.pos_y - gure.pos_y) ** 2)
@@ -128,6 +130,7 @@ class Game:
         Return:
             None.
         """
+        biy_radius = Player.height // 2
         for player_index, player in enumerate(self.players[:]):
             if player.state == PlayerState.SHOOTING:
                 for opponent in self.players[:]:
@@ -225,6 +228,6 @@ class Game:
         scaling_factor = min(self.screen.get_width() / (max_x - min_x), self.screen.get_height() / (max_y - min_y))
 
         translation_vector = (self.screen.get_width() / 2 - (max_x + min_x) / 2 * scaling_factor,
-                                self.screen.get_height() / 2 - (max_y + min_y) / 2 * scaling_factor)
+                              self.screen.get_height() / 2 - (max_y + min_y) / 2 * scaling_factor)
 
         return 1, (0, 0)
