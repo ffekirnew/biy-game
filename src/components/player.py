@@ -1,6 +1,6 @@
 import math
 from enum import Enum
-from typing import List
+from typing import List, Tuple
 
 from src.configurations import *
 from src.utility.player_state import PlayerState
@@ -11,20 +11,19 @@ class Player:
     Parameters:
         game (Game): An object of the game type.
         image_file_name (str): The name of the image file.
-        pos_x (int): The x coordinate of the player.
-        pos_y (int): The y coordinate of the player.
+        pos_x (float): The x coordinate of the player.
+        pos_y (float): The y coordinate of the player.
     Attributes:
         state (PlayerState): The state of the player.
         game (Game): An object of the game type.
-        pos_x (int): The x coordinate of the player.
-        pos_y (int): The y coordinate of the player.
+        pos_x (float): The x coordinate of the player.
+        pos_y (float): The y coordinate of the player.
         direction (int): The direction of the player.
         biy (pygame.Rect): The bounding rectangle of the player.
         image (pygame.Surface): The image of the player.
         speed_x (int): The speed of the player in the x direction.
         speed_y (int): The speed of the player in the y direction.
         gures (set): A set of gures.
-        move (list): A list of the player's movement.
     Methods:
         center(): Return the center of the player.
         handle_event(event): Handle events for the player.
@@ -34,23 +33,20 @@ class Player:
     width = player_width
     height = player_height
 
-    def __init__(self, game, image_file_name, pos_x, pos_y):
+    def __init__(self, game, image_file_name: str, pos_x: float, pos_y: float) -> None:
         self.state = PlayerState.IDLE
         self.game = game
 
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.direction = 0
+        self.speed_x = 0
+        self.speed_y = 0
 
         self.biy = pygame.Rect(self.pos_x, self.pos_y, self.width, self.height)
         self.image = pygame.transform.scale(pygame.image.load(image_file_name), (self.width, self.height))
 
-        self.speed_x = 0
-        self.speed_y = 0
-
         self.gures = set()
-
-        self.move = [self.pos_x, self.pos_y]
 
     def center(self) -> List[int]:
         """Return the center of the player.
@@ -162,20 +158,29 @@ class Player:
             return 0
         return speed
 
-    def draw(self, screen):
+    def draw(self, screen: pygame.Surface, scale_factor: float, translation_vector: Tuple[float]) -> None:
         """Draw the player.
         Parameter:
             screen (pygame.Surface): The screen to draw the player on.
+            scale_factor (float): The scale factor to scale the player by.
+            translation_vector (Tuple[float]): The translation vector to translate the player by.
         Return:
             None.
         """
         if self.state in [PlayerState.AIMING, PlayerState.POWER]:
             start = self.center()
-            end = [start[0] + 100 * math.cos(math.radians(self.direction)),
-                   start[1] + 100 * math.sin(math.radians(self.direction))]
+            end = [start[0] + 100 * math.cos(math.radians(self.direction)) * scale_factor,
+                   start[1] + 100 * math.sin(math.radians(self.direction)) * scale_factor]
             pygame.draw.line(screen, white, start, end, 2)
 
         if self.state == PlayerState.POWER:
-            self.game.power_bar.draw()
+            self.game.power_bar.draw(scale_factor)
 
+        # use the scaling factor and translation vector to calculate the players current position
+        self.pos_x = self.pos_x * scale_factor + translation_vector[0]
+        self.pos_y = self.pos_y * scale_factor + translation_vector[1]
+
+        # scale self.image to the new size
+        self.image = pygame.transform.scale(self.image,
+                                            (int(self.width * scale_factor), int(self.height * scale_factor)))
         screen.blit(self.image, (self.pos_x, self.pos_y))

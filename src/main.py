@@ -5,7 +5,7 @@ from src.components.player import Player
 from src.components.power_bar import PowerBar
 from src.game import Game
 from src.components.gure import Gure
-from src.configurations import screen_width, screen_height, white, green, red, blue, player_width
+from src.configurations import *
 
 pygame.init()
 pygame.font.init()
@@ -13,13 +13,45 @@ pygame.mixer.init()
 
 display = (screen_width, screen_height)
 screen = pygame.display.set_mode(display)
-menu_background = pygame.transform.scale(pygame.image.load("assets/images/background_2.jpg"), display)
-background = pygame.transform.scale(pygame.image.load("assets/images/background.jpg"), display)
+menu_background = pygame.transform.scale(pygame.image.load(menu_background_image_file), display)
+background = pygame.transform.scale(pygame.image.load(background_image_file), display)
 pygame.mixer.music.load("assets/music/background_music/home-head_first.mp3")
 
 pygame.display.set_caption("Biy Game")
 
 power_bar = PowerBar(screen)
+
+
+# define a loading function to show a loading screen given a loading wheel image
+def loading():
+    """Show a loading screen given a loading wheel image.
+    Parameters:
+        None.
+    Returns:
+        None.
+    """
+    loading_image = pygame.image.load(loading_image_file)
+    loading_image = pygame.transform.scale(loading_image, (100, 100))
+    loading_image_rect = loading_image.get_rect(center=(screen_width / 2, screen_height / 2))
+
+    loading_angle = 0
+    loading_speed = 5
+
+    while True:
+        screen.blit(menu_background, (0, 0))
+        screen.blit(loading_image, loading_image_rect)
+
+        loading_image = pygame.transform.rotate(loading_image, loading_angle)
+        loading_angle += loading_speed
+
+        pygame.display.update()
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                exit()
+
+        pygame.time.Clock().tick(30)
 
 
 def main_menu():
@@ -57,6 +89,9 @@ def main_menu():
                 elif event.key == pygame.K_RETURN:
                     selected_item = menu_items[selected_item_index]
                     if selected_item["action"] == "start":
+                        # loading()
+                        # wait 3 seconds before starting the game
+                        pygame.time.wait(3000)
                         return
                     elif selected_item["action"] == "options":
                         options_menu()
@@ -112,10 +147,10 @@ def main():
     game = Game(screen)
 
     players = [
-        # Player(game, "assets/images/biy/real-biy-1.png", screen_width / 2 - 450, screen_height / 2),
-        Player(game, "assets/images/biy/real-biy-2.png", screen_width / 2 + 450, screen_height / 2),
-        Player(game, "assets/images/biy/real-biy-3.png", screen_width / 2, screen_height / 4),
-        # Player(game, "assets/images/biy/real-biy-5.png", screen_width / 2, screen_height / 4 + 100),
+        # Player(game, "assets/images/biy/biy-1.png", screen_width / 2 - 450, screen_height / 2),
+        Player(game, "assets/images/biy/biy-2.png", screen_width / 2 + 450, screen_height / 2),
+        Player(game, "assets/images/biy/biy-3.png", screen_width / 2, screen_height / 4),
+        # Player(game, "assets/images/biy/biy-5.png", screen_width / 2, screen_height / 4 + 100),
     ]
 
     gures = [

@@ -1,4 +1,5 @@
 import math
+from typing import Tuple
 
 import pygame
 
@@ -32,7 +33,11 @@ class Game:
     Returns:
         None.
     """
-    def __init__(self, screen):
+
+    def __init__(self, screen: pygame.Surface) -> None:
+        self.screen_size = (screen_width, screen_height)
+        self.scale_factor = 1.0
+
         self.turn = 0
         self.players = []
         self.gures = []
@@ -78,13 +83,12 @@ class Game:
         Return:
             None.
         """
-        current_player_status = self.players[self.turn].handle_event(
-            event)  # if the player shoots, will return 1. Else 0
+        current_player_status = self.players[self.turn].handle_event(event)  # if the player shoots, will return 1. Else 0
 
         self.turn = (self.turn + current_player_status) % len(
             self.players)  # then use that to change the turn to the next player, or not
 
-    def force_turn(self, turn: int):
+    def force_turn(self, turn: int) -> None:
         """Force the turn to a specific player.
         Parameter:
             turn (int): The index of the player to force the turn to.
@@ -93,7 +97,7 @@ class Game:
         """
         self.turn = turn
 
-    def handle_gure_interactions(self):
+    def handle_gure_interactions(self) -> None:
         """Handle interactions between gures and players.
         If a player is within the radius of a gure, the player will stop moving.
         Parameter:
@@ -115,7 +119,7 @@ class Game:
                     player.pos_y = gure.pos_y
                     self.force_turn(player_index)
 
-    def handle_player_interactions(self):
+    def handle_player_interactions(self) -> None:
         """Handle interactions between players.
         If a player is shooting, check if they hit another player.
         If they do, stop the player and add the gure to the player.
@@ -164,28 +168,29 @@ class Game:
                             else:
                                 self.force_turn(player_index)
 
-    def draw_players(self):
+    def draw_players(self, scaling_factor: float, translation_vector: Tuple[float]) -> None:
         """Draw all players on the screen.
         Parameter:
-            None.
+            scaling_factor (float): The scaling factor of the game.
+            translation_vector (Tuple[float]): The translation vector of the game.
         Return:
             None.
         """
         for player in self.players:
             player.update()
-            player.draw(self.screen)
+            player.draw(self.screen, scaling_factor, translation_vector)
 
-    def draw_gures(self):
+    def draw_gures(self, scaling_factor: float, translation_vector: Tuple[float]) -> None:
         """Draw all gures on the screen.
         Parameter:
-            None.
+            scaling_factor (float): The scaling factor of the game.
         Return:
             None.
         """
         for gure in self.gures:
-            gure.draw(self.screen)
+            gure.draw(self.screen, scaling_factor, translation_vector)
 
-    def draw(self):
+    def draw(self) -> None:
         """Draw the game on the screen.
         Parameter:
             None.
@@ -195,8 +200,31 @@ class Game:
         self.handle_player_interactions()
         self.handle_gure_interactions()
 
-        self.draw_gures()
-        self.draw_players()
+        scaling_factor, translation_vector = self.determine_scaling_and_translation_vector()
+
+        self.draw_gures(scaling_factor, translation_vector)
+        self.draw_players(scaling_factor, translation_vector)
 
         if all(player.state != PlayerState.SHOOTING for player in self.players):
             self.player_indicator.draw(self.screen, self.players[self.turn])
+
+    def determine_scaling_and_translation_vector(self) -> Tuple[float, Tuple[float]]:
+        """Determine the scaling factor and translation vector to draw the game.
+        Parameter:
+            None.
+        Return:
+            scaling_factor (float): The scaling factor of the game.
+            translation_vector (Tuple[float]): The translation vector of the game.
+        """
+        # determine the most extreme x and y values and calculate the scaling factor and translation vector for all gures and playrs
+        min_x = min([gure.pos_x for gure in self.gures] + [player.pos_x for player in self.players])
+        max_x = max([gure.pos_x for gure in self.gures] + [player.pos_x for player in self.players])
+        min_y = min([gure.pos_y for gure in self.gures] + [player.pos_y for player in self.players])
+        max_y = max([gure.pos_y for gure in self.gures] + [player.pos_y for player in self.players])
+
+        scaling_factor = min(self.screen.get_width() / (max_x - min_x), self.screen.get_height() / (max_y - min_y))
+
+        translation_vector = (self.screen.get_width() / 2 - (max_x + min_x) / 2 * scaling_factor,
+                                self.screen.get_height() / 2 - (max_y + min_y) / 2 * scaling_factor)
+
+        return 1, (0, 0)
