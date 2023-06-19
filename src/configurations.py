@@ -1,5 +1,6 @@
 import pygame
 
+from src.utility.background_preference import BackgroundPreference
 from src.utility.game_mode import GameMode
 
 # Game Configurations
@@ -9,14 +10,13 @@ screen_height = 600
 game_mode = [GameMode.RANDOM]
 number_of_gures = [5]
 number_of_players = [2]
+background_image = [BackgroundPreference.MUDDY]
 
 menu_background_image_file = "assets/images/backgrounds/green-pattern.jpg"
-background_image_file = "assets/images/backgrounds/grunge-wall-texture.jpg"
+background_image_file = ["assets/images/backgrounds/retro.jpg"]
 loading_wheel_image_file = "assets/images/loading_wheels/loading.png"
 
 display = (screen_width, screen_height)
-menu_background = pygame.transform.scale(pygame.image.load(menu_background_image_file), display)
-background = pygame.transform.scale(pygame.image.load(background_image_file), display)
 
 white = pygame.Color("WHITE")
 green = pygame.Color("GREEN")

@@ -1,7 +1,7 @@
 # design a singleton class to manage the power bar in the pygame given a screen to be displayed on
 import pygame
 
-from src.configurations import white, max_power_size, screen_height, screen_width
+from src.configurations import *
 
 
 class PowerBar:
@@ -31,8 +31,6 @@ class PowerBar:
             None.
         """
         self.power_size = power_size
-        screen_power_bar_size = min(round((self.power_size / max_power_size) * (screen_width - 10)), screen_width - 20)
-        self.power_bar = pygame.Rect(10, 10, screen_power_bar_size, 10)
 
     def draw(self, scale_factor: float = 1.0) -> None:
         """Draw the power bar.
@@ -41,4 +39,8 @@ class PowerBar:
         Return:
             None.
         """
+
+        # Draw the power bar
+        screen_power_bar_size = min(round((self.power_size / max_power_size) * (screen_width - 10)), screen_width - 20)
+        self.power_bar = pygame.Rect(10, 10, screen_power_bar_size, 10, border_radius=5)
         pygame.draw.rect(self.screen, white, self.power_bar)

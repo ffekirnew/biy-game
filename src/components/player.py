@@ -48,6 +48,8 @@ class Player:
 
         self.gures = set()
 
+        self.shooting_start_position = self.center()
+
     def center(self) -> List[int]:
         """Return the center of the player.
         Parameters:
@@ -71,6 +73,8 @@ class Player:
         key = event.key
         if key == pygame.K_SPACE:
             self.state = PlayerState.SHOOTING
+            self.shooting_start_position = self.center()
+
             self.speed_x = 0.01 * self.game.power_size * math.cos(math.radians(self.direction))
             self.speed_y = 0.01 * self.game.power_size * math.sin(math.radians(self.direction))
 
@@ -121,8 +125,8 @@ class Player:
             self.game.shooting = False
 
         if not (
-                0 < self.pos_x + self.speed_x < screen_width - self.width and
-                0 < self.pos_y + self.speed_y < screen_height - self.height):
+                0 < self.pos_x + self.speed_x < self.game.screen.get_width() - self.width and
+                0 < self.pos_y + self.speed_y < self.game.screen.get_height() - self.height):
             self.stop()
 
         self.speed_x = self.update_speed(self.speed_x)

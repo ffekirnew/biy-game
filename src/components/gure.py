@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Tuple, List
 
 import pygame
 
@@ -31,6 +31,15 @@ class Gure:
         self.pos_x = posx
         self.pos_y = posy
         self.gure = pygame.Rect(posx, posy, self.width, self.height)
+
+    def center(self) -> List[int]:
+        """Return the center of the Gure.
+        Parameters:
+            None.
+        Return:
+            list: A list of the x and y coordinates of the center of the player.
+        """
+        return [self.pos_x + self.width // 2, self.pos_y + self.height // 2]
 
     def draw(self, screen: pygame.Surface, scale_factor: float, translation_vector: Tuple[float]) -> None:
         """Draw the gure on the screen.

@@ -1,5 +1,6 @@
 
 import pygame
+from pygame.locals import *
 
 from src.configurations import game_mode, number_of_players, number_of_gures
 from src.screens.loading_screen import loading
@@ -19,6 +20,12 @@ def menu_builder(screen, title, menu_items_actions):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            elif event.type == VIDEORESIZE:
+                # Handle window resizing event
+                display = event.size
+                screen[0] = pygame.display.set_mode(tuple(display), RESIZABLE)
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_item_index = (selected_item_index - 1) % len(menu_items)
@@ -30,7 +37,7 @@ def menu_builder(screen, title, menu_items_actions):
                     if menu_items_actions[selected_item] in ["2", "3", "4"]:
                         number_of_players[0] = int(menu_items_actions[selected_item])
                         if game_mode[0] != GameMode.RANDOM:
-                            loading(screen)
+                            loading(screen[0])
                             pygame.time.wait(3000)
                         else:
                             gure_number_menu(screen)
@@ -40,7 +47,7 @@ def menu_builder(screen, title, menu_items_actions):
                         pygame.quit()
                         exit()
 
-        draw_menu(screen, title, menu_items, selected_item_index)
+        draw_menu(screen[0], title, menu_items, selected_item_index)
         pygame.display.flip()
 
 

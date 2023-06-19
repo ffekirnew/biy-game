@@ -37,20 +37,46 @@ class Game:
     """
 
     def __init__(self, screen: pygame.Surface) -> None:
-        self.screen_size = (screen_width, screen_height)
+        self.screen = screen
+
+        self.screen_size = (self.screen.get_width(), self.screen.get_height())
         self.scale_factor = 1.0
 
         self.turn = 0
         self.players = []
         self.gures = []
 
-        self.screen = screen
         self.power_size = 100
 
         self.power_bar = PowerBar(self.screen)
         self.player_indicator = PlayerStatusIndicator(self.screen)
 
         self.load()
+
+    def resize(self):
+        """Resize the game.
+        Parameters:
+            None.
+        Return:
+            None.
+        """
+        # resize the screen and calculate new positions for the players and gures and change their pos_x and pos_y
+        prev_screen_size = self.screen_size
+        self.screen_size = (self.screen.get_width(), self.screen.get_height())
+        self.scale_factor = self.screen_size[0] / prev_screen_size[0]
+
+        for player in self.players:
+            player.pos_x = player.pos_x * self.scale_factor
+            player.pos_y = player.pos_y * self.scale_factor
+            player.player = pygame.Rect(player.pos_x, player.pos_y, player.width, player.height)
+
+        for gure in self.gures:
+            gure.pos_x = gure.pos_x * self.scale_factor
+            gure.pos_y = gure.pos_y * self.scale_factor
+            gure.gure = pygame.Rect(gure.pos_x, gure.pos_y, gure.width, gure.height)
+
+        self.power_bar = PowerBar(self.screen)
+        self.player_indicator = PlayerStatusIndicator(self.screen)
 
     def load(self) -> None:
         """Load the game.
@@ -59,22 +85,28 @@ class Game:
         Return:
             None.
         """
+        if background_image == BackgroundPreference.GRASSY:
+            background_image_file[
+                0] = "assets/images/backgrounds/colourful-brick-wall-seamless-pattern-with-copy-space-background.jpg"
+        else:
+            background_image_file[0] = "assets/images/backgrounds/retro.jpg"
         for i in range(number_of_players[0]):
             self.players.append(
-                Player(self, f"assets/images/biy/biy-{i + 1}{i + 1}.png", random.randint(0, screen_width),
-                       random.randint(0, screen_height)))
+                Player(self, f"assets/images/biy/biy-{i + 1}{i + 1}.png", random.randint(0, self.screen.get_width()),
+                       random.randint(0, self.screen.get_height())))
         if game_mode[0] == GameMode.RANDOM:
             for i in range(number_of_gures[0]):
-                self.gures.append(Gure(random.randint(0, screen_width), random.randint(0, screen_height)))
+                self.gures.append(
+                    Gure(random.randint(0, self.screen.get_width()), random.randint(0, self.screen.get_height())))
         else:
             # add 5 gures drawing a cross in the game
             padding = 150
             gures = [
-                Gure(screen_width // 2, screen_height // 2),
-                Gure(screen_width // 2 - padding, screen_height // 2),
-                Gure(screen_width // 2 + padding, screen_height // 2),
-                Gure(screen_width // 2, screen_height // 2 - padding),
-                Gure(screen_width // 2, screen_height // 2 + padding)
+                Gure(self.screen.get_width() // 2, self.screen.get_height() // 2),
+                Gure(self.screen.get_width() // 2 - padding, self.screen.get_height() // 2),
+                Gure(self.screen.get_width() // 2 + padding, self.screen.get_height() // 2),
+                Gure(self.screen.get_width() // 2, self.screen.get_height() // 2 - padding),
+                Gure(self.screen.get_width() // 2, self.screen.get_height() // 2 + padding)
             ]
 
             for gure in gures:
@@ -146,11 +178,13 @@ class Game:
                 next_distance = math.sqrt((next_x - gure.pos_x) ** 2 + (next_y - gure.pos_y) ** 2)
 
                 if (player.pos_x < gure.pos_x < next_x or next_y < gure.pos_y < player.pos_y) and (
-                        distance < biy_radius * 2):
+                        distance < biy_radius * 2) and (player.shooting_start_position != gure.center()):
+                    if gure.center() == player.center():
+                        continue
                     player.gures.add(gure)
                     player.stop()
-                    player.pos_x = gure.pos_x
-                    player.pos_y = gure.pos_y
+                    player.pos_x = gure.pos_x + gure.width // 2 - player.width // 2
+                    player.pos_y = gure.pos_y + gure.height // 2 - player.height // 2
                     self.force_turn(player_index)
 
     def handle_player_interactions(self) -> None:
@@ -249,8 +283,8 @@ class Game:
                 if gure not in self.players[self.turn].gures:
                     # draw a red dot on the gure
                     pygame.draw.circle(self.screen, (255, 0, 0),
-                                       (int(gure.pos_x * scaling_factor + translation_vector[0]),
-                                        int(gure.pos_y * scaling_factor + translation_vector[1])), 5)
+                                       (int(gure.pos_x + gure.width // 2),
+                                        int(gure.pos_y + gure.height // 2)), 5)
 
     def determine_scaling_and_translation_vector(self) -> Tuple[float, Tuple[float]]:
         """Determine the scaling factor and translation vector to draw the game.

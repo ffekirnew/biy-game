@@ -1,5 +1,7 @@
 import pygame
+from pygame.locals import *
 
+from src.configurations import menu_background_image_file, display
 from src.screens.menu_screens.options_menu import options_menu
 from src.screens.menu_screens import draw_menu
 from src.screens.menu_screens.mode_menu import mode_menu
@@ -16,6 +18,12 @@ def menu_builder(screen, title, menu_items_actions):
             if event.type == pygame.QUIT:
                 pygame.quit()
                 exit()
+
+            elif event.type == VIDEORESIZE:
+                # Handle window resizing event
+                display = event.size
+                screen[0] = pygame.display.set_mode(tuple(display), RESIZABLE)
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_item_index = (selected_item_index - 1) % len(menu_items)
@@ -33,7 +41,7 @@ def menu_builder(screen, title, menu_items_actions):
                         pygame.quit()
                         exit()
 
-        draw_menu(screen, title, menu_items, selected_item_index)
+        draw_menu(screen[0], title, menu_items, selected_item_index)
         pygame.display.flip()
 
 

@@ -1,10 +1,9 @@
 import pygame
 from pygame.locals import *
 
-from src.configurations import game_mode, number_of_players, number_of_gures
-from src.screens.menu_screens import options_menu, draw_menu
-from src.screens.menu_screens.player_number_menu import player_number_menu
-from src.utility.game_mode import GameMode
+from src.configurations import background_image
+from src.screens.menu_screens import draw_menu
+from src.utility.background_preference import BackgroundPreference
 
 
 def menu_builder(screen, title, menu_items_actions):
@@ -23,6 +22,7 @@ def menu_builder(screen, title, menu_items_actions):
                 # Handle window resizing event
                 display = event.size
                 screen[0] = pygame.display.set_mode(tuple(display), RESIZABLE)
+
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_UP:
                     selected_item_index = (selected_item_index - 1) % len(menu_items)
@@ -31,30 +31,25 @@ def menu_builder(screen, title, menu_items_actions):
                 elif event.key == pygame.K_RETURN:
                     selected_item = menu_items[selected_item_index]
 
-                    if menu_items_actions[selected_item] == "random":
-                        game_mode[0] = GameMode.RANDOM
-                        player_number_menu(screen)
+                    if menu_items_actions[selected_item] in [BackgroundPreference.MUDDY, BackgroundPreference.GRASSY]:
+                        background_image[0] = menu_items_actions[selected_item]
                         return
-                    elif menu_items_actions[selected_item] == "five_gure":
-                        game_mode[0] = GameMode.FIVEGURE
-                        player_number_menu(screen)
+
+                    elif menu_items_actions[selected_item] == "back":
                         return
-                    elif menu_items_actions[selected_item] == "quit":
-                        pygame.quit()
-                        exit()
 
         draw_menu(screen[0], title, menu_items, selected_item_index)
         pygame.display.flip()
 
 
-def mode_menu(screen):
+def background_image_menu(screen):
     title_text = "ጨዋታ ይግዙ"
-    random_game_text = ("Random", "random")
-    five_gure_text = ("Five Gure", "five_gure")
-    quit_text = ("ውጣ", "quit")
+    muddy = ("muddy", BackgroundPreference.MUDDY)
+    grassy = ("grassy", BackgroundPreference.GRASSY)
+    back = ("back", "back")
 
     menu_builder(screen, title_text, {
-        random_game_text[0]: random_game_text[1],
-        five_gure_text[0]: five_gure_text[1],
-        quit_text[0]: quit_text[1]
+        muddy[0]: muddy[1],
+        grassy[0]: grassy[1],
+        back[0]: back[1]
     })

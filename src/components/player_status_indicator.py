@@ -1,8 +1,6 @@
 # Implement a player indicator component that will be used in the pygame window
 import pygame
 
-from src.configurations import player_width, screen_width, screen_height
-
 
 class PlayerStatusIndicator:
     """Implement a player indicator component that will be used in the pygame window.
@@ -19,14 +17,16 @@ class PlayerStatusIndicator:
     Returns:
         None.
     """
-    padding = 10
-    pos_x = screen_width - 260 - padding
-    pos_y = screen_height - 50 - padding
-    height = screen_height - pos_y - padding
-    width = screen_width - pos_x - padding
 
     def __init__(self, screen: pygame.Surface) -> None:
         self.screen = screen
+
+        self.padding = 10
+        self.pos_x = self.screen.get_width() - 260 - self.padding
+        self.pos_y = self.screen.get_height() - 50 - self.padding
+        self.height = self.screen.get_height() - self.pos_y - self.padding
+        self.width = self.screen.get_width() - self.pos_x - self.padding
+
         self.font = pygame.font.SysFont("JetBrains Mono", 20)
         self.color = pygame.Color("WHITE")
 
