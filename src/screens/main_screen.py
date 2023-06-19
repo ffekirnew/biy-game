@@ -17,10 +17,9 @@ def main(screen):
 
     main_menu(screen)
 
+    game = Game(screen[0])
     display = (screen[0].get_width(), screen[0].get_height())
     background = pygame.transform.scale(pygame.image.load(background_image_file[0]), display)
-
-    game = Game(screen[0])
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

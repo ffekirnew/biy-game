@@ -124,10 +124,11 @@ class Player:
         if self.speed_x == 0 and self.speed_y == 0:
             self.game.shooting = False
 
-        if not (
-                0 < self.pos_x + self.speed_x < self.game.screen.get_width() - self.width and
-                0 < self.pos_y + self.speed_y < self.game.screen.get_height() - self.height):
-            self.stop()
+        if self.pos_x <= self.width or self.pos_x >= self.game.screen.get_width():
+            self.speed_x = -1 * self.speed_x
+
+        if self.pos_y <= self.height or self.pos_y >= self.game.screen.get_height():
+            self.speed_y = -1 * self.speed_y
 
         self.speed_x = self.update_speed(self.speed_x)
         self.speed_y = self.update_speed(self.speed_y)
@@ -154,7 +155,7 @@ class Player:
         Return:
             int: The updated speed of the player.
         """
-        speedDx = {True: -0.005, False: 0.005}
+        speedDx = {True: -0.05, False: 0.05}
         x = speed > 0
         speed += speedDx[speed > 0]
         y = speed > 0

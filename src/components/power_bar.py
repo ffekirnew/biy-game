@@ -42,5 +42,5 @@ class PowerBar:
 
         # Draw the power bar
         screen_power_bar_size = min(round((self.power_size / max_power_size) * (screen_width - 10)), screen_width - 20)
-        self.power_bar = pygame.Rect(10, 10, screen_power_bar_size, 10, border_radius=5)
+        self.power_bar = pygame.Rect(10, 10, screen_power_bar_size, 10)
         pygame.draw.rect(self.screen, white, self.power_bar)

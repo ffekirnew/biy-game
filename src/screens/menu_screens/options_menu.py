@@ -41,9 +41,9 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def options_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    background_text = ("Choose Background", "start")
-    back_text = ("Back", "back")
+    title_text = "የብይ ጨዋታ"
+    background_text = ("ባግራውንድ ለመቀየር", "start")
+    back_text = ("ተመለስ", "back")
 
     menu_builder(screen, title_text, {
         background_text[0]: background_text[1],

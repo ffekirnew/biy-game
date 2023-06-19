@@ -24,7 +24,7 @@ class Game:
         screen (pygame.Surface): The pygame window.
         power_size (int): The power size of the game.
         power_bar (PowerBar): An object of the power bar type.
-        player_indicator (PlayerStatusIndicator): An object of the player indicator type.
+        player_status_indicator (PlayerStatusIndicator): An object of the player indicator type.
     Methods:
         add_player(player): Add a new player to the game.
         add_gure(gure): Add a new gure to the game.
@@ -49,7 +49,7 @@ class Game:
         self.power_size = 100
 
         self.power_bar = PowerBar(self.screen)
-        self.player_indicator = PlayerStatusIndicator(self.screen)
+        self.player_status_indicator = PlayerStatusIndicator(self.screen)
 
         self.load()
 
@@ -76,7 +76,7 @@ class Game:
             gure.gure = pygame.Rect(gure.pos_x, gure.pos_y, gure.width, gure.height)
 
         self.power_bar = PowerBar(self.screen)
-        self.player_indicator = PlayerStatusIndicator(self.screen)
+        self.player_status_indicator = PlayerStatusIndicator(self.screen)
 
     def load(self) -> None:
         """Load the game.
@@ -85,19 +85,22 @@ class Game:
         Return:
             None.
         """
-        if background_image == BackgroundPreference.GRASSY:
+        if background_preference[0] == BackgroundPreference.GRASSY:
+            print('here')
             background_image_file[
                 0] = "assets/images/backgrounds/colourful-brick-wall-seamless-pattern-with-copy-space-background.jpg"
         else:
             background_image_file[0] = "assets/images/backgrounds/retro.jpg"
         for i in range(number_of_players[0]):
             self.players.append(
-                Player(self, f"assets/images/biy/biy-{i + 1}{i + 1}.png", random.randint(0, self.screen.get_width()),
-                       random.randint(0, self.screen.get_height())))
+                Player(self, f"assets/images/biy/biy-{i + 1}{i + 1}.png",
+                       random.randint(0, self.screen.get_width() - 50),
+                       random.randint(0, self.screen.get_height() - 50)))
         if game_mode[0] == GameMode.RANDOM:
             for i in range(number_of_gures[0]):
                 self.gures.append(
-                    Gure(random.randint(0, self.screen.get_width()), random.randint(0, self.screen.get_height())))
+                    Gure(random.randint(0, self.screen.get_width() - 100),
+                         random.randint(0, self.screen.get_height() - 100)))
         else:
             # add 5 gures drawing a cross in the game
             padding = 150
@@ -171,16 +174,14 @@ class Game:
             None.
         """
         biy_radius = Player.height // 2
-        for player_index, player in enumerate(self.players[:]):
+        for player_index, player in enumerate(self.players):
             for gure in self.gures:
                 distance = math.sqrt((player.pos_x - gure.pos_x) ** 2 + (player.pos_y - gure.pos_y) ** 2)
                 next_x, next_y = player.pos_x + player.speed_x, player.pos_y + player.speed_y
                 next_distance = math.sqrt((next_x - gure.pos_x) ** 2 + (next_y - gure.pos_y) ** 2)
 
-                if (player.pos_x < gure.pos_x < next_x or next_y < gure.pos_y < player.pos_y) and (
-                        distance < biy_radius * 2) and (player.shooting_start_position != gure.center()):
-                    if gure.center() == player.center():
-                        continue
+                if (distance < biy_radius * 2) and (next_distance < biy_radius * 2) and (
+                        player.shooting_start_position != gure.center()):
                     player.gures.add(gure)
                     player.stop()
                     player.pos_x = gure.pos_x + gure.width // 2 - player.width // 2
@@ -269,13 +270,13 @@ class Game:
         self.handle_player_interactions()
         self.handle_gure_interactions()
 
-        scaling_factor, translation_vector = self.determine_scaling_and_translation_vector()
+        scaling_factor, translation_vector = (1, (0, 0))
 
         self.draw_gures(scaling_factor, translation_vector)
         self.draw_players(scaling_factor, translation_vector)
 
         if all(player.state != PlayerState.SHOOTING for player in self.players):
-            self.player_indicator.draw(self.players[self.turn], len(self.gures))
+            self.player_status_indicator.draw(self.players[self.turn], len(self.gures))
 
         # flash on the gures still left to complete with red for the player that is aiming or powering
         if self.players[self.turn].state == PlayerState.AIMING or self.players[self.turn].state == PlayerState.POWER:
@@ -284,25 +285,4 @@ class Game:
                     # draw a red dot on the gure
                     pygame.draw.circle(self.screen, (255, 0, 0),
                                        (int(gure.pos_x + gure.width // 2),
-                                        int(gure.pos_y + gure.height // 2)), 5)
-
-    def determine_scaling_and_translation_vector(self) -> Tuple[float, Tuple[float]]:
-        """Determine the scaling factor and translation vector to draw the game.
-        Parameter:
-            None.
-        Return:
-            scaling_factor (float): The scaling factor of the game.
-            translation_vector (Tuple[float]): The translation vector of the game.
-        """
-        # determine the most extreme x and y values and calculate the scaling factor and translation vector for all gures and playrs
-        min_x = min([gure.pos_x for gure in self.gures] + [player.pos_x for player in self.players])
-        max_x = max([gure.pos_x for gure in self.gures] + [player.pos_x for player in self.players])
-        min_y = min([gure.pos_y for gure in self.gures] + [player.pos_y for player in self.players])
-        max_y = max([gure.pos_y for gure in self.gures] + [player.pos_y for player in self.players])
-
-        scaling_factor = min(self.screen.get_width() / (max_x - min_x), self.screen.get_height() / (max_y - min_y))
-
-        translation_vector = (self.screen.get_width() / 2 - (max_x + min_x) / 2 * scaling_factor,
-                              self.screen.get_height() / 2 - (max_y + min_y) / 2 * scaling_factor)
-
-        return 1, (0, 0)
+                                        int(gure.pos_y + gure.height // 2)), 4)

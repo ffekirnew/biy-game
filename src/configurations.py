@@ -10,10 +10,11 @@ screen_height = 600
 game_mode = [GameMode.RANDOM]
 number_of_gures = [5]
 number_of_players = [2]
-background_image = [BackgroundPreference.MUDDY]
+background_preference = [BackgroundPreference.GRASSY]
 
 menu_background_image_file = "assets/images/backgrounds/green-pattern.jpg"
-background_image_file = ["assets/images/backgrounds/retro.jpg"]
+background_image_file = [
+    "assets/images/backgrounds/colourful-brick-wall-seamless-pattern-with-copy-space-background.jpg"]
 loading_wheel_image_file = "assets/images/loading_wheels/loading.png"
 
 display = (screen_width, screen_height)

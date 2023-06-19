@@ -36,7 +36,7 @@ def menu_builder(screen, title, menu_items_actions):
 
                     if menu_items_actions[selected_item] in ["2", "3", "4"]:
                         number_of_players[0] = int(menu_items_actions[selected_item])
-                        if game_mode[0] != GameMode.RANDOM:
+                        if game_mode[0] == GameMode.FIVEGURE:
                             loading(screen[0])
                             pygame.time.wait(3000)
                         else:
@@ -52,11 +52,11 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def player_number_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    two_players = ("2 Players", "2")
-    three_players = ("3 Players", "3")
-    four_players = ("4 Players", "4")
-    quit = ("quit", "quit")
+    title_text = "የብይ ጨዋታ"
+    two_players = ("2 ተጫዋች", "2")
+    three_players = ("3 ተጫዋች", "3")
+    four_players = ("4 ተጫዋች", "4")
+    quit = ("ውጣ", "quit")
 
     menu_builder(screen, title_text, {
         two_players[0]: two_players[1],

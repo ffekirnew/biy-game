@@ -48,9 +48,9 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def mode_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    random_game_text = ("Random", "random")
-    five_gure_text = ("Five Gure", "five_gure")
+    title_text = "የብይ ጨዋታ"
+    random_game_text = ("ራንደም", "random")
+    five_gure_text = ("5 ጉሬ", "five_gure")
     quit_text = ("ውጣ", "quit")
 
     menu_builder(screen, title_text, {

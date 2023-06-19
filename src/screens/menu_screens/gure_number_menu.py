@@ -46,11 +46,11 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def gure_number_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    two_players = ("2 Gures", "2")
-    three_players = ("3 Gures", "3")
-    four_players = ("4 Gures", "4")
-    quit = ("quit", "quit")
+    title_text = "የብይ ጨዋታ"
+    two_players = ("2 ጉሬ", "2")
+    three_players = ("3 ጉሬ", "3")
+    four_players = ("4 ጉሬ", "4")
+    quit = ("ውጣ", "quit")
 
     menu_builder(screen, title_text, {
         two_players[0]: two_players[1],

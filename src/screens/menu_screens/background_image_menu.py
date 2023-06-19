@@ -1,7 +1,7 @@
 import pygame
 from pygame.locals import *
 
-from src.configurations import background_image
+from src.configurations import background_preference
 from src.screens.menu_screens import draw_menu
 from src.utility.background_preference import BackgroundPreference
 
@@ -32,7 +32,7 @@ def menu_builder(screen, title, menu_items_actions):
                     selected_item = menu_items[selected_item_index]
 
                     if menu_items_actions[selected_item] in [BackgroundPreference.MUDDY, BackgroundPreference.GRASSY]:
-                        background_image[0] = menu_items_actions[selected_item]
+                        background_preference[0] = menu_items_actions[selected_item]
                         return
 
                     elif menu_items_actions[selected_item] == "back":
@@ -43,10 +43,10 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def background_image_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    muddy = ("muddy", BackgroundPreference.MUDDY)
-    grassy = ("grassy", BackgroundPreference.GRASSY)
-    back = ("back", "back")
+    title_text = "የብይ ጨዋታ"
+    muddy = ("ጭቃማ", BackgroundPreference.MUDDY)
+    grassy = ("ሳራማ", BackgroundPreference.GRASSY)
+    back = ("ተመለስ", "back")
 
     menu_builder(screen, title_text, {
         muddy[0]: muddy[1],

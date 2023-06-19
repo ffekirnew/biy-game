@@ -46,8 +46,8 @@ def menu_builder(screen, title, menu_items_actions):
 
 
 def main_menu(screen):
-    title_text = "ጨዋታ ይግዙ"
-    start_text = ("እስከ", "start")
+    title_text = "የብይ ጨዋታ"
+    start_text = ("ጀምር", "start")
     options_text = ("አማራጭ", "options")
     quit_text = ("ውጣ", "quit")
 
